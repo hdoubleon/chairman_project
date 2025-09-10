@@ -62,3 +62,26 @@ logs/
 *.bak
 *.tmp
 *.swp
+
+# Frontend tooling caches and reports
+.eslintcache
+.stylelintcache
+.cache/
+.turbo/
+.parcel-cache/
+coverage/
+.nyc_output/
+
+# Test runners
+cypress/videos/
+cypress/screenshots/
+playwright-report/
+test-results/
+
+# Hosting platforms
+.vercel/
+.netlify/
+
+# Env files (keep example)
+.env.*
+!.env.example

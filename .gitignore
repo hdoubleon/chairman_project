@@ -30,3 +30,35 @@ go.work.sum
 # Editor/IDE
 # .idea/
 # .vscode/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+dist/
+build/
+.vite/
+out/
+
+.env
+.env.local
+.env.*.local
+
+*.log
+logs/
+
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+*.bak
+*.tmp
+*.swp

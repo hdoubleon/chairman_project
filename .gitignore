@@ -8,6 +8,9 @@
 *.so
 *.dylib
 
+/bin/
+/pkg/
+
 # Test binary, built with `go test -c`
 *.test
 
@@ -24,8 +27,6 @@ profile.cov
 go.work
 go.work.sum
 
-# env file
-.env
 
 # Editor/IDE
 # .idea/

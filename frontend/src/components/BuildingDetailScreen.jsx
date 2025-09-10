@@ -1,0 +1,181 @@
+import React, { useState } from 'react';
+import { Button } from './ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+import { Badge } from './ui/badge';
+import { 
+  ChevronDown,
+  ChevronUp,
+  ArrowLeft
+} from 'lucide-react';
+import { useStudyRoom } from '../contexts/StudyRoomContext.jsx';
+import { BuildingFloorView } from './BuildingFloorView';
+import { ImageWithFallback } from './figma/ImageWithFallback';
+
+export function BuildingDetailScreen({ onNavigate, buildingId }) {
+  const { state, dispatch } = useStudyRoom();
+  const [selectedFloorDropdown, setSelectedFloorDropdown] = useState(null);
+
+  const building = state.buildings.find(b => b.id === buildingId);
+  
+  if (!building) {
+    return (
+      <div className="flex-1 overflow-auto p-4">
+        <div className="text-center py-8">
+          <p className="text-muted-foreground">건물을 찾을 수 없습니다.</p>
+          <Button 
+            onClick={() => onNavigate('home')}
+            className="mt-4"
+          >
+            홈으로 돌아가기
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // 첫 번째 층을 기본 선택
+  const currentFloorId = state.selectedFloor || building.floors[0]?.id;
+  const selectedFloor = building.floors.find(f => f.id === currentFloorId);
+
+  const handleFloorSelect = (floorId) => {
+    dispatch({ type: 'SELECT_FLOOR', payload: floorId });
+    setSelectedFloorDropdown(null);
+  };
+
+  const handleSeatClick = (seatId) => {
+    dispatch({ type: 'SELECT_SEAT', payload: seatId });
+    onNavigate('map');
+  };
+
+  const getBuildingIcon = (buildingCode) => {
+    switch (buildingCode) {
+      case 'MR': return '🏢';
+      case 'LB': return '📚';
+      case 'SS': return '🎨';
+      default: return '🏫';
+    }
+  };
+
+  const getBuildingImage = (buildingCode) => {
+    switch (buildingCode) {
+      case 'MR': return 'https://images.unsplash.com/photo-1600239401291-385542139183?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjB1bml2ZXJzaXR5JTIwYnVpbGRpbmclMjBhcmNoaXRlY3R1cmV8ZW58MXx8fHwxNzU3Mzk3MDM4fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral';
+      case 'LB': return 'https://images.unsplash.com/photo-1656849093660-f672e7dabaca?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsaWJyYXJ5JTIwYnVpbGRpbmclMjBtb2Rlcm58ZW58MXx8fHwxNzU3NDkxNDIwfDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral';
+      case 'SS': return 'https://images.unsplash.com/photo-1707109463055-05893850bbfb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjcmVhdGl2ZSUyMGFydHMlMjBidWlsZGluZyUyMHVuaXZlcnNpdHl8ZW58MXx8fHwxNzU3NDkxNDIzfDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral';
+      default: return 'https://images.unsplash.com/photo-1600239401291-385542139183?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjB1bml2ZXJzaXR5JTIwYnVpbGRpbmclMjBhcmNoaXRlY3R1cmV8ZW58MXx8fHwxNzU3Mzk3MDM4fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral';
+    }
+  };
+
+  return (
+    <div className="flex-1 overflow-auto">
+      {/* 건물 이미지 헤더 */}
+      <div className="relative">
+        <ImageWithFallback
+          src={getBuildingImage(building.code)}
+          alt={`${building.name} 건물`}
+          className="w-full h-48 object-cover"
+        />
+        
+        {/* 뒤로가기 버튼 - 이미지 위에 오버레이 */}
+        <div className="absolute top-4 left-4">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => onNavigate('home')}
+            className="bg-black/50 text-white hover:bg-black/70 backdrop-blur-sm"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </Button>
+        </div>
+        
+        {/* 건물명 오버레이 */}
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
+          <h1 className="text-white text-2xl font-medium">{building.name}</h1>
+        </div>
+      </div>
+
+      <div className="p-4">
+        {/* 층 선택 섹션 */}
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-lg font-medium">층별 현황</h2>
+          {selectedFloor && (
+            <div className="relative">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setSelectedFloorDropdown(
+                  selectedFloorDropdown === building.id ? null : building.id
+                )}
+                className="min-w-16"
+              >
+                {selectedFloor.number}F
+                {selectedFloorDropdown === building.id ? (
+                  <ChevronUp className="w-4 h-4 ml-1" />
+                ) : (
+                  <ChevronDown className="w-4 h-4 ml-1" />
+                )}
+              </Button>
+              
+              {selectedFloorDropdown === building.id && (
+                <div className="absolute right-0 top-full mt-1 bg-card border border-border rounded-md shadow-lg z-10 min-w-24">
+                  {building.floors.map((floor) => (
+                    <button
+                      key={floor.id}
+                      onClick={() => handleFloorSelect(floor.id)}
+                      className={`w-full px-3 py-2 text-left hover:bg-accent text-sm ${
+                        floor.id === selectedFloor.id ? 'bg-accent font-medium' : ''
+                      }`}
+                    >
+                      {floor.number}F
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* 간소화된 현황 정보 */}
+        <div className="grid grid-cols-3 gap-3 mb-4">
+          <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-center">
+            <div className="text-lg font-semibold text-green-600">{building.availableSeats}</div>
+            <div className="text-xs text-green-700">사용 가능</div>
+          </div>
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-center">
+            <div className="text-lg font-semibold text-blue-600">
+              {building.totalSeats - building.availableSeats}
+            </div>
+            <div className="text-xs text-blue-700">사용 중</div>
+          </div>
+          <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 text-center">
+            <div className="text-lg font-semibold text-gray-600">{building.totalSeats}</div>
+            <div className="text-xs text-gray-700">전체</div>
+          </div>
+        </div>
+        
+        {/* 층별 요약 */}
+        <div className="flex gap-2 flex-wrap mb-6">
+          {building.floors.map((floor) => {
+            const floorAvailable = floor.seats.filter(seat => seat.isAvailable && !seat.isReserved).length;
+            return (
+              <Badge 
+                key={floor.id}
+                variant={floorAvailable > 0 ? "default" : "secondary"}
+                className="text-xs"
+              >
+                {floor.number}F: {floorAvailable}석
+              </Badge>
+            );
+          })}
+        </div>
+        
+        {/* 선택된 층의 상세 정보 */}
+        {selectedFloor && (
+          <BuildingFloorView 
+            floor={selectedFloor}
+            onSeatClick={handleSeatClick}
+          />
+        )}
+      </div>
+    </div>
+  );
+}

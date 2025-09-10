@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="서울과학기술대학교 자습실 자리 예약 및 관리 웹앱" />
+  <meta name="theme-color" content="#030213" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  
+  <!-- PWA 메타 태그 -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="자리관리" />
+  
+  <!-- iOS 아이콘 -->
+  <link rel="apple-touch-icon" href="/icon-192.png" />
+  
+  <title>서울과학기술대학교 자리 관리</title>
+</head>
+<body>
+  <div id="root"></div>
+  
+  <!-- PWA 서비스 워커 등록 -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then((registration) => {
+            console.log('SW registered: ', registration);
+          })
+          .catch((registrationError) => {
+            console.log('SW registration failed: ', registrationError);
+          });
+      });
+    }
+  </script>
+  
+  <script type="module" src="/main.tsx"></script>
+</body>
+</html>

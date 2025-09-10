@@ -4,8 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
 import { 
   ChevronDown,
-  ChevronUp,
-  ArrowLeft
+  ChevronUp
 } from 'lucide-react';
 import { useStudyRoom } from '../contexts/StudyRoomContext';
 import { BuildingFloorView } from './BuildingFloorView';
@@ -81,18 +80,6 @@ export function BuildingDetailScreen({ onNavigate, buildingId }: BuildingDetailS
           alt={`${building.name} 건물`}
           className="w-full h-48 object-cover"
         />
-        
-        {/* 뒤로가기 버튼 - 이미지 위에 오버레이 */}
-        <div className="absolute top-4 left-4">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => onNavigate('home')}
-            className="bg-black/50 text-white hover:bg-black/70 backdrop-blur-sm"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-        </div>
         
         {/* ��물명 오버레이 */}
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">

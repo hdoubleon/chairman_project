@@ -84,77 +84,47 @@ export function BuildingDetailScreen({ onNavigate, buildingId }) {
         {/* 층 선택 섹션 */}
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-lg font-medium">층별 현황</h2>
-          {selectedFloor && (
-            <div className="relative">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setSelectedFloorDropdown(
-                  selectedFloorDropdown === building.id ? null : building.id
-                )}
-                className="min-w-16"
-              >
-                {selectedFloor.number}F
-                {selectedFloorDropdown === building.id ? (
-                  <ChevronUp className="w-4 h-4 ml-1" />
-                ) : (
-                  <ChevronDown className="w-4 h-4 ml-1" />
-                )}
-              </Button>
-              
-              {selectedFloorDropdown === building.id && (
-                <div className="absolute right-0 top-full mt-1 bg-card border border-border rounded-md shadow-lg z-10 min-w-24">
-                  {building.floors.map((floor) => (
-                    <button
-                      key={floor.id}
-                      onClick={() => handleFloorSelect(floor.id)}
-                      className={`w-full px-3 py-2 text-left hover:bg-accent text-sm ${
-                        floor.id === selectedFloor.id ? 'bg-accent font-medium' : ''
-                      }`}
-                    >
-                      {floor.number}F
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
         </div>
 
-        {/* 간소화된 현황 정보 */}
-        <div className="grid grid-cols-3 gap-3 mb-4">
-          <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-center">
-            <div className="text-lg font-semibold text-green-600">{building.availableSeats}</div>
-            <div className="text-xs text-green-700">사용 가능</div>
-          </div>
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-center">
-            <div className="text-lg font-semibold text-blue-600">
-              {building.totalSeats - building.availableSeats}
-            </div>
-            <div className="text-xs text-blue-700">사용 중</div>
-          </div>
-          <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 text-center">
-            <div className="text-lg font-semibold text-gray-600">{building.totalSeats}</div>
-            <div className="text-xs text-gray-700">전체</div>
-          </div>
-        </div>
-        
-        {/* 층별 요약 */}
-        <div className="flex gap-2 flex-wrap mb-6">
+        {/* 층별 원형 그래프 섹션 */}
+        <div className="flex gap-6 justify-center mb-6">
           {building.floors.map((floor) => {
-            const floorAvailable = floor.seats.filter(seat => seat.isAvailable && !seat.isReserved).length;
+            const available = floor.seats.filter(seat => seat.isAvailable && !seat.isReserved).length;
+            const total = floor.seats.length;
+            const percent = total === 0 ? 0 : available / total;
+            const selected = selectedFloor && selectedFloor.id === floor.id;
+            const radius = 28;
+            const circumference = 2 * Math.PI * radius;
+            const offset = circumference * (1 - percent);
             return (
-              <Badge 
+              <div
                 key={floor.id}
-                variant={floorAvailable > 0 ? "default" : "secondary"}
-                className="text-xs"
+                className={`rounded-xl p-3 flex flex-col items-center cursor-pointer transition-colors duration-200 border ${selected ? 'bg-gray-100 border-blue-400' : 'bg-white border-gray-200 hover:bg-gray-50'}`}
+                onClick={() => handleFloorSelect(floor.id)}
+                style={{ minWidth: 90 }}
               >
-                {floor.number}F: {floorAvailable}석
-              </Badge>
+                <svg width="64" height="64" viewBox="0 0 64 64">
+                  <g transform="rotate(-90 32 32)">
+                    <circle cx="32" cy="32" r="28" fill="#f3f4f6" stroke="#e5e7eb" strokeWidth="4" />
+                    <circle
+                      cx="32" cy="32" r="28"
+                      fill="none"
+                      stroke={selected ? '#2563eb' : '#22c55e'}
+                      strokeWidth="6"
+                      strokeDasharray={circumference}
+                      strokeDashoffset={offset}
+                      style={{ transition: 'stroke-dashoffset 0.5s' }}
+                    />
+                  </g>
+                  <text x="32" y="36" textAnchor="middle" fontSize="16" fill="#222">
+                    {available}/{total}
+                  </text>
+                </svg>
+                <div className={`mt-2 text-sm font-medium ${selected ? 'text-blue-600' : 'text-gray-700'}`}>{floor.number}F</div>
+              </div>
             );
           })}
         </div>
-        
         {/* 선택된 층의 상세 정보 */}
         {selectedFloor && (
           <BuildingFloorView 
